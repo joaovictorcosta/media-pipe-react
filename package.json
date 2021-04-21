@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@mediapipe/camera_utils": "^0.1.1617146909",
+    "@mediapipe/drawing_utils": "^0.2.1617146986",
+    "@mediapipe/face_mesh": "^0.1.1617147239",
+    "@mediapipe/hands": "^0.1.1617147326",
+    "@mediapipe/holistic": "^0.1.1617147418",
+    "@mediapipe/pose": "^0.2.1617147663",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
