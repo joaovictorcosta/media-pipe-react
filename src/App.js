@@ -5,6 +5,10 @@ import {
   drawLandmarks,
   lerp,
 } from '@mediapipe/drawing_utils/drawing_utils'
+import {
+  treat_keypoints_func
+} from './pre_process.js'
+
 import { POSE_CONNECTIONS, POSE_LANDMARKS } from '@mediapipe/pose/pose'
 
 import {
@@ -20,6 +24,15 @@ import { HAND_CONNECTIONS } from '@mediapipe/hands/hands'
 
 import { Camera } from '@mediapipe/camera_utils/camera_utils'
 
+/**
+ * Calcula a média de um array
+ * @param values array de valores para se calcular a média
+ * @returns retorna um número representando a média da amostra
+ */
+let poses = [];
+let l_hand = [];
+let r_hand = [];
+let prediction_count = 0;
 function App() {
   const canvasElementRef = createRef()
   const videoElementRef = createRef()
@@ -53,10 +66,74 @@ function App() {
     }
   }
 
+
+
   function onResults(results) {
     const canvasCtx = canvasElementRef.current.getContext('2d')
     const canvasElement = canvasElementRef.current
+    let  data;
+    if (results.poseLandmarks !== undefined)
+    {
+      let key_aux = []
+      for (let i = 0; i < 25; i++) {
+          key_aux.push([results.poseLandmarks[i].x,results.poseLandmarks[i].y,results.poseLandmarks[i].y])
+          }
+      poses.push(key_aux)
+    }
+    else
+    {
+      let key_aux = []
+      for (let i = 0; i < 25; i++) {
+          key_aux.push([0.0,0.0,0.0])
+          }
+      poses.push(key_aux)
+    }
 
+    if (results.leftHandLandmarks !== undefined)
+    {
+      let key_aux = []
+      for (let i = 0; i < 21; i++) {
+          key_aux.push([results.leftHandLandmarks[i].x,results.leftHandLandmarks[i].y,results.leftHandLandmarks[i].y])
+          }
+      l_hand.push(key_aux)
+    }
+    else
+    {
+      let key_aux = []
+      for (let i = 0; i < 21; i++) {
+          key_aux.push([0.0,0.0,0.0])
+          }
+      l_hand.push(key_aux)
+    }
+
+    if (results.rightHandLandmarks !== undefined)
+    {
+      let key_aux = []
+      for (let i = 0; i < 21; i++) {
+          key_aux.push([results.rightHandLandmarks[i].x,results.rightHandLandmarks[i].y,results.rightHandLandmarks[i].y])
+          }
+      r_hand.push(key_aux)
+    }
+    else
+    {
+      let key_aux = []
+      for (let i = 0; i < 21; i++) {
+          key_aux.push([0.0,0.0,0.0])
+          }
+      r_hand.push(key_aux)
+    }
+
+    if (poses.length > 60)
+    {
+      poses.pop();
+      l_hand.pop();
+      r_hand.pop();
+    }
+    prediction_count +=1
+    if (prediction_count%30 == 0)
+    {
+      data = treat_keypoints_func(poses, l_hand, r_hand)
+    }
     removeLandmarks(results)
 
     canvasCtx.save()
